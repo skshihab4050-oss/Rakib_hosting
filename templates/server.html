@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{ server_name }} | {{ site_name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ac: {{ theme_color }};
+            --ac-dim: {{ theme_color }}88;
+            --ac-lite: {{ theme_color }}11;
+            --ac-glow: {{ theme_color }}22;
+            --red: #ef4444;
+            --red-dim: #ef444488;
+            --blue: #38bdf8;
+            --blue-dim: #38bdf888;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a12;
+            color: #e5e7eb;
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            padding-bottom: 30px;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a12;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--ac-dim);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--ac);
+        }
+        
+        header {
+            background: rgba(10, 10, 18, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 2px solid var(--ac-dim);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            flex-wrap: wrap;
+        }
+        
+        .back {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid #2a2a2a;
+            color: #6b7280;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all .3s;
+            flex-shrink: 0;
+        }
+        
+        .back:hover {
+            background: #1a1a1a;
+            color: #fff;
+            border-color: var(--ac);
+            transform: scale(1.05);
+        }
+        
+        .header-info {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .server-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(16px, 2.5vw, 20px);
+            font-weight: 700;
+            color: #fff;
+            margin-right: 10px;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+        
+        .status-badge {
+            padding: 4px 14px;
+            border-radius: 8px;
+            font-size: clamp(10px, 1.5vw, 11px);
+            font-weight: 700;
+            border: 2px solid;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
+        
+        .status-badge.running {
+            border-color: var(--ac);
+            color: var(--ac);
+            box-shadow: 0 0 20px var(--ac-lite);
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .status-badge.stopped {
+            border-color: var(--red);
+            color: var(--red);
+        }
+        
+        .sub {
+            font-size: clamp(11px, 1.5vw, 12px);
+            color: #4b5563;
+            margin-top: 2px;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+        
+        .sub span {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1px 8px;
+            border-radius: 4px;
+            border: 1px solid #1a1a2a;
+            margin-right: 4px;
+        }
+        
+        .btn {
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(12px, 1.5vw, 13px);
+            font-weight: 700;
+            cursor: pointer;
+            border: 2px solid;
+            background: transparent;
+            transition: all .3s;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .btn-ac {
+            border-color: var(--ac);
+            color: var(--ac);
+        }
+        .btn-ac:hover {
+            background: var(--ac-lite);
+            box-shadow: 0 0 30px var(--ac-dim);
+            transform: translateY(-2px);
+        }
+        
+        .btn-red {
+            border-color: var(--red);
+            color: var(--red);
+        }
+        .btn-red:hover {
+            background: rgba(239, 68, 68, 0.1);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        main {
+            padding: 20px;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: rgba(10, 10, 20, 0.6);
+            border: 2px solid #1a1a2a;
+            border-radius: 12px;
+            padding: 4px;
+            width: fit-content;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(10px, 1.5vw, 11px);
+            cursor: pointer;
+            letter-spacing: 2px;
+            background: transparent;
+            color: #6b7280;
+            transition: all .3s;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        
+        .tab.active {
+            background: var(--ac-lite);
+            color: var(--ac);
+            text-shadow: 0 0 20px var(--ac);
+            border: 1px solid var(--ac-dim);
+        }
+        
+        .tab:hover:not(.active) {
+            color: #fff;
+        }
+        
+        .tab-panel {
+            display: none;
+            animation: fadeSlide 0.3s ease;
+        }
+        
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-panel.active {
+            display: block;
+        }
+        
+        .upload-zone {
+            border: 2px dashed #2a2a2a;
+            border-radius: 16px;
+            padding: 32px 20px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(10, 10, 20, 0.4);
+            transition: all .3s;
+            margin-bottom: 16px;
+        }
+        
+        .upload-zone:hover,
+        .upload-zone.drag {
+            border-color: var(--ac);
+            background: var(--ac-lite);
+            transform: scale(1.01);
+        }
+        
+        .upload-zone.drag {
+            transform: scale(1.02);
+            box-shadow: 0 0 40px var(--ac-glow);
+        }
+        
+        .upload-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+            opacity: .5;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-zone:hover .upload-icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .upload-title {
+            font-size: clamp(14px, 2vw, 15px);
+            color: #6b7280;
+            font-weight: 600;
+        }
+        
+        .upload-sub {
+            font-size: clamp(11px, 1.5vw, 12px);
+            color: #374151;
+            margin-top: 4px;
+        }
+        
+        .card {
+            background: rgba(10, 10, 20, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid #1a1a2a;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 10px 16px;
+            border-bottom: 2px solid #1a1a2a;
+            font-size: clamp(11px, 1.5vw, 12px);
+            color: #4b5563;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .file-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            border-bottom: 2px solid #0d0d0d;
+            font-size: clamp(12px, 1.5vw, 13px);
+            transition: background .2s;
+        }
+        
+        .file-row:last-child {
+            border-bottom: none;
+        }
+        
+        .file-row:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        .file-name {
+            flex: 1;
+            color: #9ca3af;
+            font-weight: 400;
+            word-break: break-all;
+        }
+        
+        .file-name.main {
+            color: var(--ac);
+            font-weight: 600;
+        }
+        
+        .file-size {
+            color: #374151;
+            font-size: clamp(10px, 1.2vw, 12px);
+            white-space: nowrap;
+        }
+        
+        .main-tag {
+            font-size: clamp(9px, 1.2vw, 10px);
+            color: var(--ac);
+            border: 2px solid var(--ac-dim);
+            border-radius: 4px;
+            padding: 1px 8px;
+            margin-left: 8px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .main-tag-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            background: var(--ac-lite);
+            border: 2px solid var(--ac-dim);
+            border-radius: 10px;
+            margin-bottom: 14px;
+            font-size: clamp(12px, 1.5vw, 13px);
+            font-weight: 500;
+            flex-wrap: wrap;
+        }
+        
+        .settings-card {
+            background: rgba(10, 10, 20, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid #1a1a2a;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            font-size: clamp(11px, 1.5vw, 12px);
+            color: #6b7280;
+            display: block;
+            margin-bottom: 6px;
+            letter-spacing: 2px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid #2a2a2a;
+            border-radius: 10px;
+            color: #e5e7eb;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(13px, 1.8vw, 14px);
+            outline: none;
+            transition: all .3s;
+            font-weight: 500;
+        }
+        
+        .form-input:focus {
+            border-color: var(--ac);
+            box-shadow: 0 0 20px var(--ac-lite);
+        }
+        
+        .form-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .file-pick {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .pick-btn {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: clamp(11px, 1.5vw, 12px);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid #2a2a2a;
+            color: #6b7280;
+            background: transparent;
+            transition: all .2s;
+        }
+        
+        .pick-btn:hover {
+            border-color: var(--ac);
+            color: var(--ac);
+            background: var(--ac-lite);
+            transform: translateY(-2px);
+        }
+        
+        .pick-btn.sel {
+            border-color: var(--ac);
+            color: var(--ac);
+            background: var(--ac-lite);
+            box-shadow: 0 0 15px var(--ac-glow);
+        }
+        
+        .log-box {
+            background: rgba(10, 10, 20, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid #1a1a2a;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        
+        pre.log-content {
+            font-family: 'Rajdhani', monospace;
+            font-size: clamp(12px, 1.5vw, 13px);
+            color: var(--ac);
+            padding: 16px;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            line-height: 1.6;
+            margin: 0;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        pre.log-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        pre.log-content::-webkit-scrollbar-thumb {
+            background: var(--ac-dim);
+            border-radius: 2px;
+        }
+        
+        .log-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .log-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid #2a2a2a;
+            border-radius: 8px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 4px 12px;
+            font-size: clamp(10px, 1.2vw, 11px);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            transition: all .2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .log-btn:hover {
+            border-color: var(--ac);
+            color: var(--ac);
+            background: var(--ac-lite);
+        }
+        
+        .log-btn.clear-btn {
+            border-color: var(--red-dim);
+            color: var(--red);
+        }
+        .log-btn.clear-btn:hover {
+            border-color: var(--red);
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .log-btn.active {
+            border-color: var(--ac);
+            color: var(--ac);
+            background: var(--ac-lite);
+        }
+        
+        .info-box {
+            background: rgba(10, 10, 20, 0.4);
+            border: 2px solid #1a1a2a;
+            border-radius: 14px;
+            padding: 16px;
+            font-size: clamp(12px, 1.5vw, 13px);
+            color: #6b7280;
+            display: flex;
+            gap: 12px;
+            font-weight: 400;
+            align-items: flex-start;
+        }
+        
+        .info-box .icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(10, 10, 20, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 2px solid var(--ac);
+            border-radius: 14px;
+            padding: 14px 22px;
+            font-size: clamp(13px, 1.8vw, 14px);
+            color: var(--ac);
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all .4s;
+            z-index: 200;
+            box-shadow: 0 0 40px var(--ac-lite);
+            font-weight: 600;
+            letter-spacing: 1px;
+            max-width: 90%;
+        }
+        
+        #toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        /* Upload progress overlay */
+        .upload-progress {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 10, 20, 0.95);
+            border: 2px solid var(--ac);
+            border-radius: 16px;
+            padding: 30px;
+            z-index: 150;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 200px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        
+        .upload-progress.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .upload-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--ac-dim);
+            border-top-color: var(--ac);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            header {
+                padding: 10px 16px;
+                gap: 8px;
+            }
+            
+            .back {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+            
+            main {
+                padding: 12px;
+            }
+            
+            .tabs {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .tab {
+                padding: 8px 14px;
+                font-size: 10px;
+            }
+            
+            .upload-zone {
+                padding: 24px 16px;
+            }
+            
+            .settings-card {
+                padding: 16px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .header-info {
+                min-width: 120px;
+            }
+            
+            .btn {
+                padding: 6px 14px;
+                font-size: 11px;
+            }
+            
+            .file-row {
+                padding: 8px 12px;
+                flex-wrap: wrap;
+            }
+        }
+        
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/dashboard" class="back" title="Back to Dashboard">←</a>
+        <div class="header-info">
+            <div>
+                <span class="server-title">◈ {{ server_name.upper() }}</span>
+                <span class="status-badge {{ config.status }}" id="statusBadge">{{ config.status.upper() }}</span>
+            </div>
+            <div class="sub">
+                <span>{{ config.runtime.upper() }}</span>
+                <span>{{ config.get('main_file') or 'no main file' }}</span>
+                <span>port {{ config.get('port', 8080) }}</span>
+            </div>
+        </div>
+        <div>
+            {% if config.status == 'running' %}
+            <button class="btn btn-red" id="actionBtn" onclick="stopServer()">■ STOP</button>
+            {% else %}
+            <button class="btn btn-ac" id="actionBtn" onclick="startServer()">▶ START</button>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        <div class="tabs">
+            <button class="tab active" data-tab="files" onclick="switchTab('files', this)">FILES</button>
+            <button class="tab" data-tab="settings" onclick="switchTab('settings', this)">SETTINGS</button>
+            <button class="tab" data-tab="logs" onclick="switchTab('logs', this)">LOGS</button>
+        </div>
+
+        <!-- FILES TAB -->
+        <div id="tab-files" class="tab-panel active">
+            <div class="upload-zone" id="dropZone">
+                <input type="file" id="fileInput" accept=".zip,.py,.js,.ts,.html,.css,.json,.txt,.md,.sh,.yml,.yaml,.ini,.cfg,.conf" hidden>
+                <div class="upload-icon">📁</div>
+                <div class="upload-title" id="uploadTitle">Click or drag to upload files</div>
+                <div class="upload-sub">Supports: .zip, .py, .js, .ts, .html, .css, .json, .txt, .md, .sh</div>
+            </div>
+            
+            {% if config.get('main_file') %}
+            <div class="main-tag-bar">
+                <span style="opacity:.6">◆ MAIN:</span>
+                <span style="color:var(--ac)">{{ config.get('main_file') }}</span>
+                <span style="color:#374151;margin-left:auto;font-size:clamp(11px, 1.2vw, 12px)">Change in Settings</span>
+            </div>
+            {% endif %}
+            
+            {% if files %}
+            <div class="card">
+                <div class="card-header">
+                    <span>{{ files|length }} FILE(S)</span>
+                    <span style="font-weight:400;font-size:10px;color:#374151">📂 {{ files|selectattr('type', 'equalto', 'dir')|list|length }} dirs</span>
+                </div>
+                {% for f in files %}
+                <div class="file-row">
+                    <span>{{ '📂' if f.type == 'dir' else '📄' }}</span>
+                    <span class="file-name {% if f.path == config.get('main_file') %}main{% endif %}">
+                        {{ f.path }}{% if f.path == config.get('main_file') %}<span class="main-tag">MAIN</span>{% endif %}
+                    </span>
+                    {% if f.type == 'file' %}<span class="file-size">{{ '%.1f'|format(f.size/1024) }}kb</span>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align:center;padding:40px 20px;color:#374151;font-size:14px;font-weight:400">
+                <div style="font-size:48px;margin-bottom:12px;opacity:0.3">📂</div>
+                No files uploaded yet<br>
+                <span style="font-size:12px;color:#2a2a2a">Upload your project files above</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- SETTINGS TAB -->
+        <div id="tab-settings" class="tab-panel">
+            <div class="settings-card">
+                <div style="font-size:clamp(11px, 1.5vw, 12px);color:#4b5563;letter-spacing:2px;margin-bottom:18px;font-weight:600;text-transform:uppercase">
+                    ⚙ Project Configuration
+                </div>
+                <div class="form-group">
+                    <label class="form-label">MAIN FILE</label>
+                    <input type="text" id="mainFile" class="form-input" value="{{ config.get('main_file') or '' }}" placeholder="main.py">
+                    <div style="font-size:clamp(11px, 1.2vw, 12px);color:#374151;margin-top:4px;font-weight:300">
+                        e.g. app.py, main.py, bot.py, index.js
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">MAIN COMMAND (optional)</label>
+                    <input type="text" id="mainCommand" class="form-input" value="{{ config.get('main_command') or '' }}" placeholder="python main.py">
+                    <div style="font-size:clamp(11px, 1.2vw, 12px);color:#374151;margin-top:4px;font-weight:300">
+                        Full command: <span style="color:#fbbf24;font-weight:600">python bot.py</span> or <span style="color:#fbbf24;font-weight:600">node index.js</span>
+                    </div>
+                </div>
+                {% if files %}
+                <div class="form-group">
+                    <div style="font-size:clamp(11px, 1.2vw, 12px);color:#374151;margin-bottom:8px;font-weight:400">
+                        📂 PICK FROM FILES:
+                    </div>
+                    <div class="file-pick" id="filePickContainer">
+                        {% for f in files %}
+                        {% if not f.type == 'dir' and (f.name.endswith('.py') or f.name.endswith('.js') or f.name.endswith('.ts') or f.name.endswith('.html') or f.name.endswith('.sh') or f.name.endswith('.rb') or f.name.endswith('.go') or f.name.endswith('.rs') or f.name.endswith('.c') or f.name.endswith('.cpp') or f.name.endswith('.java') or f.name.endswith('.kt')) %}
+                        <button class="pick-btn {% if f.path == config.get('main_file') %}sel{% endif %}" 
+                                data-path="{{ f.path }}" 
+                                onclick="setMain('{{ f.path }}', this)">{{ f.path }}</button>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                <div class="form-group">
+                    <label class="form-label">PORT</label>
+                    <input type="number" id="serverPort" class="form-input" value="{{ config.get('port',8080) }}" style="max-width:160px" min="1" max="65535">
+                </div>
+                <button class="btn btn-ac" style="padding:12px 28px;font-size:clamp(12px, 1.5vw, 13px);letter-spacing:2px;width:100%" onclick="saveSettings()">
+                    ⟳ SAVE SETTINGS
+                </button>
+            </div>
+            <div class="info-box">
+                <span class="icon">ⓘ</span>
+                <div>
+                    For Railway/Heroku: ensure <span style="color:#fbbf24;font-weight:600">requirements.txt</span> and <span style="color:#fbbf24;font-weight:600">Procfile</span> exist.<br>
+                    <span style="font-size:11px;color:#374151">Tip: Use "python -m flask run" as command for Flask apps</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGS TAB -->
+        <div id="tab-logs" class="tab-panel">
+            <div class="log-box">
+                <div class="card-header">
+                    <span>📋 OUTPUT LOGS <span id="logAutoLabel" style="color:#4b5563;font-size:10px;font-weight:400"></span></span>
+                    <div class="log-actions">
+                        <button class="log-btn clear-btn" onclick="clearLogs()">✕ CLEAR</button>
+                        <button class="log-btn" id="autoRefreshBtn" onclick="toggleAutoRefresh()">⏸ AUTO</button>
+                        <button class="log-btn" onclick="loadLogs()">⟳ REFRESH</button>
+                    </div>
+                </div>
+                <pre class="log-content" id="logContent">Loading logs...</pre>
+            </div>
+        </div>
+    </main>
+
+    <!-- Upload Progress -->
+    <div class="upload-progress" id="uploadProgress">
+        <div class="upload-spinner"></div>
+        <span style="color:var(--ac);font-size:clamp(13px, 1.8vw, 14px);font-weight:600">Uploading...</span>
+        <span style="color:#6b7280;font-size:12px" id="uploadProgressText">Preparing files</span>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        (function() {
+            'use strict';
+            
+            const S = '{{ server_name }}';
+            const AC = getComputedStyle(document.documentElement).getPropertyValue('--ac').trim();
+            
+            // ===== TOAST =====
+            function toast(msg, color) {
+                const t = document.getElementById('toast');
+                t.textContent = msg;
+                t.style.borderColor = color || AC;
+                t.style.color = color || AC;
+                t.classList.add('show');
+                clearTimeout(t._timeout);
+                t._timeout = setTimeout(() => t.classList.remove('show'), 3500);
+            }
+            
+            // ===== TAB SWITCH =====
+            window.switchTab = function(name, el) {
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.getElementById('tab-' + name).classList.add('active');
+                el.classList.add('active');
+                
+                // Stop auto-refresh when switching away from logs
+                if (name !== 'logs' && window._autoRefreshInterval) {
+                    clearInterval(window._autoRefreshInterval);
+                    window._autoRefreshInterval = null;
+                    document.getElementById('autoRefreshBtn').textContent = '▶ AUTO';
+                    document.getElementById('logAutoLabel').textContent = '';
+                }
+                
+                // Load logs when switching to logs tab
+                if (name === 'logs') {
+                    loadLogs();
+                    if (window._autoRefreshOn !== false) {
+                        startAutoRefresh();
+                    }
+                }
+            };
+            
+            // ===== SET MAIN FILE =====
+            window.setMain = function(path, el) {
+                document.getElementById('mainFile').value = path;
+                document.querySelectorAll('.pick-btn').forEach(b => b.classList.remove('sel'));
+                el.classList.add('sel');
+                toast('✓ Main file set to: ' + path);
+            };
+            
+            // ===== FILE UPLOAD =====
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            
+            dropZone.addEventListener('click', () => fileInput.click());
+            
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag');
+            });
+            
+            dropZone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag');
+            });
+            
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag');
+                if (e.dataTransfer.files.length) {
+                    handleUpload(e.dataTransfer.files[0]);
+                }
+            });
+            
+            fileInput.addEventListener('change', function() {
+                if (this.files.length) {
+                    handleUpload(this.files[0]);
+                }
+                this.value = '';
+            });
+            
+            async function handleUpload(file) {
+                if (!file) return;
+                
+                // Validate file size (max 10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    toast('✗ File too large (max 10MB)', '#ef4444');
+                    return;
+                }
+                
+                const progress = document.getElementById('uploadProgress');
+                const progressText = document.getElementById('uploadProgressText');
+                progress.classList.add('show');
+                progressText.textContent = 'Uploading ' + file.name + '...';
+                
+                const fd = new FormData();
+                fd.append('file', file);
+                
+                try {
+                    const r = await fetch('/server/' + S + '/upload', {
+                        method: 'POST',
+                        body: fd
+                    });
+                    const d = await r.json();
+                    
+                    if (d.success) {
+                        toast('✓ Uploaded ' + d.files.length + ' file(s)');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        toast('✗ ' + (d.error || 'Upload failed'), '#ef4444');
+                    }
+                } catch (e) {
+                    toast('✗ Upload failed: ' + e.message, '#ef4444');
+                } finally {
+                    progress.classList.remove('show');
+                }
+            }
+            
+            // ===== SAVE SETTINGS =====
+            window.saveSettings = async function() {
+                const mf = document.getElementById('mainFile').value.trim();
+                const mc = document.getElementById('mainCommand').value.trim();
+                const port = parseInt(document.getElementById('serverPort').value) || 8080;
+                
+                if (port < 1 || port > 65535) {
+                    toast('✗ Invalid port number (1-65535)', '#ef4444');
+                    return;
+                }
+                
+                try {
+                    const r = await fetch('/server/' + S + '/settings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ main_file: mf, main_command: mc, port })
+                    });
+                    const d = await r.json();
+                    
+                    if (d.success) {
+                        toast('✓ Settings saved');
+                        setTimeout(() => location.reload(), 1200);
+                    } else {
+                        toast('✗ ' + (d.error || 'Failed to save'), '#ef4444');
+                    }
+                } catch (e) {
+                    toast('✗ Error: ' + e.message, '#ef4444');
+                }
+            };
+            
+            // ===== START/STOP SERVER =====
+            window.startServer = async function() {
+                const btn = document.getElementById('actionBtn');
+                btn.disabled = true;
+                btn.textContent = '⏳';
+                
+                try {
+                    const r = await fetch('/server/' + S + '/start', { method: 'POST' });
+                    const d = await r.json();
+                    
+                    if (d.success) {
+                        toast('✓ Server started');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        toast('✗ ' + (d.error || 'Failed to start'), '#ef4444');
+                        btn.disabled = false;
+                        btn.textContent = '▶ START';
+                    }
+                } catch (e) {
+                    toast('✗ Error: ' + e.message, '#ef4444');
+                    btn.disabled = false;
+                    btn.textContent = '▶ START';
+                }
+            };
+            
+            window.stopServer = async function() {
+                if (!confirm('Stop server ' + S + '?')) return;
+                
+                const btn = document.getElementById('actionBtn');
+                btn.disabled = true;
+                btn.textContent = '⏳';
+                
+                try {
+                    const r = await fetch('/server/' + S + '/stop', { method: 'POST' });
+                    const d = await r.json();
+                    
+                    if (d.success) {
+                        toast('✓ Server stopped');
+                        setTimeout(() => location.reload(), 1200);
+                    } else {
+                        toast('✗ Failed to stop', '#ef4444');
+                        btn.disabled = false;
+                        btn.textContent = '■ STOP';
+                    }
+                } catch (e) {
+                    toast('✗ Error: ' + e.message, '#ef4444');
+                    btn.disabled = false;
+                    btn.textContent = '■ STOP';
+                }
+            };
+            
+            // ===== LOGS =====
+            window.loadLogs = async function() {
+                try {
+                    const r = await fetch('/server/' + S + '/logs');
+                    const d = await r.json();
+                    const el = document.getElementById('logContent');
+                    const atBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 40;
+                    
+                    el.textContent = d.logs || 'No logs yet. Start the server to see output.';
+                    
+                    if (atBottom) {
+                        el.scrollTop = el.scrollHeight;
+                    }
+                } catch (e) {
+                    document.getElementById('logContent').textContent = 'Error loading logs: ' + e.message;
+                }
+            };
+            
+            window.clearLogs = async function() {
+                if (!confirm('Clear all logs for ' + S + '?')) return;
+                
+                try {
+                    await fetch('/server/' + S + '/logs/clear', { method: 'POST' });
+                    document.getElementById('logContent').textContent = 'Logs cleared.';
+                    toast('✓ Logs cleared');
+                } catch (e) {
+                    toast('✗ Failed to clear logs', '#ef4444');
+                }
+            };
+            
+            window.toggleAutoRefresh = function() {
+                const btn = document.getElementById('autoRefreshBtn');
+                const lbl = document.getElementById('logAutoLabel');
+                
+                if (window._autoRefreshInterval) {
+                    clearInterval(window._autoRefreshInterval);
+                    window._autoRefreshInterval = null;
+                    window._autoRefreshOn = false;
+                    btn.textContent = '▶ AUTO';
+                    btn.classList.remove('active');
+                    lbl.textContent = '';
+                } else {
+                    window._autoRefreshOn = true;
+                    btn.textContent = '⏸ AUTO';
+                    btn.classList.add('active');
+                    lbl.textContent = '• live';
+                    startAutoRefresh();
+                }
+            };
+            
+            function startAutoRefresh() {
+                if (window._autoRefreshInterval) {
+                    clearInterval(window._autoRefreshInterval);
+                }
+                window._autoRefreshInterval = setInterval(loadLogs, 2000);
+            }
+            
+            // ===== THEME COLOR CYCLE (Slower) =====
+            const colors = ['#00ff41', '#a855f7', '#38bdf8', '#ef4444', '#fbbf24', '#06b6d4', '#ec4899', '#84cc16'];
+            let colorIndex = 0;
+            let colorInterval = setInterval(() => {
+                colorIndex = (colorIndex + 1) % colors.length;
+                const newColor = colors[colorIndex];
+                const root = document.documentElement;
+                
+                root.style.setProperty('--ac', newColor);
+                root.style.setProperty('--ac-dim', newColor + '88');
+                root.style.setProperty('--ac-lite', newColor + '11');
+                root.style.setProperty('--ac-glow', newColor + '22');
+                
+                // Update elements
+                document.querySelectorAll('.status-badge.running, .server-title, .btn-ac, .main-tag').forEach(el => {
+                    el.style.color = newColor;
+                    if (el.classList.contains('status-badge.running')) {
+                        el.style.borderColor = newColor;
+                    }
+                    if (el.classList.contains('btn-ac')) {
+                        el.style.borderColor = newColor;
+                    }
+                    if (el.classList.contains('main-tag')) {
+                        el.style.borderColor = newColor + '88';
+                    }
+                });
+                
+                document.querySelectorAll('.pick-btn.sel, .tab.active, .main-tag-bar').forEach(el => {
+                    el.style.borderColor = newColor + '88';
+                    if (el.classList.contains('pick-btn')) {
+                        el.style.color = newColor;
+                        el.style.background = newColor + '11';
+                    }
+                });
+                
+            }, 3000); // Changed from 200ms to 3000ms (3 seconds)
+            
+            // ===== INITIAL LOGS LOAD =====
+            // Load logs after page load
+            setTimeout(loadLogs, 500);
+            
+            // ===== CLEANUP =====
+            window.addEventListener('beforeunload', function() {
+                if (colorInterval) clearInterval(colorInterval);
+                if (window._autoRefreshInterval) clearInterval(window._autoRefreshInterval);
+            });
+            
+            // ===== KEYBOARD SHORTCUTS =====
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+S to save settings
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    const activeTab = document.querySelector('.tab-panel.active');
+                    if (activeTab && activeTab.id === 'tab-settings') {
+                        saveSettings();
+                    }
+                }
+                // 'r' key to refresh logs (when on logs tab)
+                if (e.key === 'r' && !e.ctrlKey && !e.metaKey) {
+                    const activeTab = document.querySelector('.tab-panel.active');
+                    if (activeTab && activeTab.id === 'tab-logs') {
+                        e.preventDefault();
+                        loadLogs();
+                    }
+                }
+            });
+            
+            console.log('%c🔧 Server Manager: ' + S, 'font-size:16px; font-weight:bold; color:' + AC + ';');
+            console.log('%cStatus: {{ config.status.upper() }}', 'font-size:14px; color:#6b7280;');
+            
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{ site_name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a12;
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Fallback background animation */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(0,255,65,0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(168,85,247,0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 100%, rgba(56,189,248,0.02) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 420px;
+            padding: 0 16px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            background: rgba(10, 10, 20, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid {{ theme_color }};
+            border-radius: 30px;
+            padding: 40px 36px;
+            box-shadow: 0 0 80px {{ theme_color }}22, 0 0 160px {{ theme_color }}11;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, {{ theme_color }}08, transparent, {{ theme_color }}08, transparent);
+            animation: spin 20s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Glow border animation */
+        .card::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 30px;
+            padding: 2px;
+            background: conic-gradient(from 0deg, {{ theme_color }}, transparent, {{ theme_color }}, transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        
+        .card:hover::after {
+            opacity: 0.3;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .logo img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid {{ theme_color }};
+            box-shadow: 0 0 40px {{ theme_color }}44, 0 0 80px {{ theme_color }}22;
+            object-fit: cover;
+            background: #000;
+            transition: all 0.3s ease;
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        .logo img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 60px {{ theme_color }}66;
+        }
+        
+        /* Fallback if image fails to load */
+        .logo img::after {
+            content: '🔐';
+            font-size: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: #0a0a12;
+        }
+        
+        .brand {
+            text-align: center;
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(20px, 4vw, 24px);
+            font-weight: 900;
+            color: {{ theme_color }};
+            letter-spacing: 6px;
+            text-shadow: 0 0 30px {{ theme_color }};
+            margin-bottom: 4px;
+            position: relative;
+            transition: all 0.5s ease;
+        }
+        
+        .sub {
+            text-align: center;
+            font-size: clamp(10px, 2vw, 12px);
+            color: {{ theme_color }}66;
+            letter-spacing: 5px;
+            margin-bottom: 28px;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+        
+        .prompt {
+            font-size: clamp(14px, 2.5vw, 16px);
+            color: {{ theme_color }};
+            margin-bottom: 16px;
+            opacity: .85;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background: {{ theme_color }};
+            margin-left: 4px;
+            vertical-align: middle;
+            animation: blink 1s step-end infinite;
+            flex-shrink: 0;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .error-box {
+            background: rgba(42, 8, 8, 0.9);
+            border: 2px solid #ef4444;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #f87171;
+            margin-bottom: 14px;
+            font-weight: 500;
+            animation: shake 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            padding-right: 50px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid {{ theme_color }}66;
+            border-radius: 14px;
+            color: {{ theme_color }};
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            outline: none;
+            transition: all .3s ease;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+        
+        input:focus {
+            border-color: {{ theme_color }};
+            box-shadow: 0 0 30px {{ theme_color }}22, inset 0 0 20px {{ theme_color }}11;
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        input::placeholder {
+            color: {{ theme_color }}44;
+            font-weight: 400;
+            letter-spacing: 2px;
+            font-size: 14px;
+        }
+        
+        /* Password toggle button */
+        .toggle-pw {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: {{ theme_color }}66;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 4px;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+        
+        .toggle-pw:hover {
+            color: {{ theme_color }};
+        }
+        
+        .auth-btn {
+            width: 100%;
+            padding: 16px;
+            background: transparent;
+            border: 3px solid {{ theme_color }};
+            border-radius: 14px;
+            color: {{ theme_color }};
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(12px, 2vw, 14px);
+            font-weight: 700;
+            letter-spacing: 4px;
+            cursor: pointer;
+            transition: all .3s ease;
+            margin-top: 4px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+        
+        .auth-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, {{ theme_color }}22, transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .auth-btn:hover::before {
+            left: 100%;
+        }
+        
+        .auth-btn:hover {
+            background: {{ theme_color }}11;
+            box-shadow: 0 0 50px {{ theme_color }}33;
+            transform: scale(1.02);
+        }
+        
+        .auth-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: clamp(9px, 1.5vw, 10px);
+            color: {{ theme_color }}44;
+            letter-spacing: 2px;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+        
+        /* Loading state */
+        .auth-btn.loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .auth-btn.loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4) infinite;
+        }
+        
+        @keyframes dots {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .card {
+                padding: 30px 24px;
+                border-radius: 24px;
+            }
+            
+            .logo img {
+                width: 80px;
+                height: 80px;
+            }
+            
+            input {
+                padding: 12px 16px;
+                padding-right: 44px;
+                font-size: 15px;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .card {
+                padding: 24px 18px;
+                border-radius: 20px;
+            }
+            
+            .brand {
+                letter-spacing: 3px;
+                font-size: 18px;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #0a0a12;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Canvas Background -->
+    <canvas id="matrix"></canvas>
+    
+    <div class="container">
+        <div class="card">
+            <div class="logo">
+                <a href="t.me/Dev_yt_44" target="_blank" rel="noopener noreferrer">
+                    <img src="https://i.ibb.co/pBg504T9/4891b6369ce9be0aaa324e60bf6ae68f.jpg" 
+                         alt="Logo" 
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'width:100px;height:100px;border-radius:50%;border:3px solid {{ theme_color }};background:{{ theme_color }}22;display:flex;align-items:center;justify-content:center;font-size:48px;margin:0 auto;\'>🔐</div>'">
+                </a>
+            </div>
+            
+            <div class="brand" id="brandText">{{ site_name }}</div>
+            <div class="sub">• SECURE TERMINAL v3.0 •</div>
+            
+            <div class="prompt">
+                > ACCESS_REQUEST
+                <span class="cursor"></span>
+            </div>
+            
+            {% if error %}
+            <div class="error-box">
+                <span>⚠</span>
+                {{ error }}
+            </div>
+            {% endif %}
+            
+            <form method="POST" id="loginForm" autocomplete="off">
+                <div class="input-wrapper">
+                    <input type="password" 
+                           name="password" 
+                           id="passwordInput"
+                           placeholder="• ENTER ACCESS CODE •" 
+                           required 
+                           autofocus
+                           autocomplete="current-password">
+                    <button type="button" class="toggle-pw" id="togglePwBtn" aria-label="Toggle password visibility">
+                        👁️
+                    </button>
+                </div>
+                <button type="submit" class="auth-btn" id="loginBtn">⏣ AUTHENTICATE</button>
+            </form>
+            
+            <div class="footer">
+                ⛔ UNAUTHORIZED ACCESS PROHIBITED<br>
+                {{ site_name }} • SECURE SYSTEMS
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+            
+            // ===== MATRIX EFFECT =====
+            const canvas = document.getElementById('matrix');
+            const ctx = canvas.getContext('2d');
+            
+            let width, height, cols, drops;
+            const chars = '01アイウエオカキクケコ';
+            
+            function resizeCanvas() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                cols = Math.floor(width / 14);
+                drops = Array(cols).fill(1);
+            }
+            
+            resizeCanvas();
+            
+            let matrixInterval;
+            
+            function drawMatrix() {
+                ctx.fillStyle = 'rgba(10, 10, 18, 0.05)';
+                ctx.fillRect(0, 0, width, height);
+                
+                const ac = document.querySelector('.brand')?.style.color || '{{ theme_color }}';
+                ctx.fillStyle = ac + '33';
+                ctx.font = '12px monospace';
+                
+                for (let i = 0; i < drops.length; i++) {
+                    const char = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(char, i * 14, drops[i] * 14);
+                    
+                    if (drops[i] * 14 > height && Math.random() > 0.98) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+            
+            // Start matrix with optimized interval
+            matrixInterval = setInterval(drawMatrix, 80);
+            
+            // Resize handler
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    resizeCanvas();
+                }, 250);
+            });
+            
+            // ===== COLOR CYCLE =====
+            const colors = ['#00ff41', '#a855f7', '#38bdf8', '#ef4444', '#fbbf24', '#06b6d4', '#ec4899', '#84cc16'];
+            let colorIndex = 0;
+            let colorInterval;
+            
+            function cycleColors() {
+                colorIndex = (colorIndex + 1) % colors.length;
+                const nc = colors[colorIndex];
+                const root = document.documentElement;
+                
+                // Update CSS variables
+                root.style.setProperty('--ac', nc);
+                root.style.setProperty('--ac-dim', nc + '66');
+                
+                // Update elements
+                const brand = document.getElementById('brandText');
+                const card = document.querySelector('.card');
+                const btn = document.querySelector('.auth-btn');
+                const prompt = document.querySelector('.prompt');
+                const cursor = document.querySelector('.cursor');
+                const input = document.querySelector('input');
+                const logo = document.querySelector('.logo img');
+                const toggleBtn = document.querySelector('.toggle-pw');
+                
+                if (brand) {
+                    brand.style.color = nc;
+                    brand.style.textShadow = '0 0 30px ' + nc;
+                }
+                
+                if (card) {
+                    card.style.borderColor = nc;
+                    card.style.boxShadow = '0 0 80px ' + nc + '22, 0 0 160px ' + nc + '11';
+                }
+                
+                if (btn) {
+                    btn.style.borderColor = nc;
+                    btn.style.color = nc;
+                }
+                
+                if (prompt) {
+                    prompt.style.color = nc;
+                }
+                
+                if (cursor) {
+                    cursor.style.background = nc;
+                }
+                
+                if (input) {
+                    input.style.borderColor = nc + '66';
+                }
+                
+                if (logo) {
+                    logo.style.borderColor = nc;
+                    logo.style.boxShadow = '0 0 40px ' + nc + '44, 0 0 80px ' + nc + '22';
+                }
+                
+                if (toggleBtn) {
+                    toggleBtn.style.color = nc + '66';
+                }
+            }
+            
+            // Start color cycling (slower for better UX)
+            colorInterval = setInterval(cycleColors, 2000);
+            
+            // ===== PASSWORD TOGGLE =====
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleBtn = document.getElementById('togglePwBtn');
+            let passwordVisible = false;
+            
+            toggleBtn.addEventListener('click', function() {
+                passwordVisible = !passwordVisible;
+                passwordInput.type = passwordVisible ? 'text' : 'password';
+                this.textContent = passwordVisible ? '🙈' : '👁️';
+            });
+            
+            // ===== FORM SUBMISSION =====
+            const loginForm = document.getElementById('loginForm');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            loginForm.addEventListener('submit', function(e) {
+                const password = passwordInput.value.trim();
+                
+                if (!password) {
+                    e.preventDefault();
+                    passwordInput.focus();
+                    passwordInput.style.borderColor = '#ef4444';
+                    passwordInput.style.boxShadow = '0 0 30px #ef444422';
+                    
+                    setTimeout(() => {
+                        passwordInput.style.borderColor = '';
+                        passwordInput.style.boxShadow = '';
+                    }, 3000);
+                    return;
+                }
+                
+                // Show loading state
+                loginBtn.classList.add('loading');
+                loginBtn.textContent = '⏣ AUTHENTICATING';
+                
+                // Re-enable after 5 seconds if no response (fallback)
+                setTimeout(() => {
+                    loginBtn.classList.remove('loading');
+                    loginBtn.textContent = '⏣ AUTHENTICATE';
+                }, 5000);
+            });
+            
+            // ===== KEYBOARD SHORTCUTS =====
+            document.addEventListener('keydown', function(e) {
+                // Escape to clear input
+                if (e.key === 'Escape' && passwordInput === document.activeElement) {
+                    passwordInput.value = '';
+                    passwordInput.blur();
+                }
+                
+                // Enter to submit
+                if (e.key === 'Enter' && passwordInput === document.activeElement) {
+                    loginForm.dispatchEvent(new Event('submit'));
+                }
+            });
+            
+            // ===== CLEANUP (optional) =====
+            // Clean up intervals if page unloads
+            window.addEventListener('beforeunload', function() {
+                if (matrixInterval) clearInterval(matrixInterval);
+                if (colorInterval) clearInterval(colorInterval);
+            });
+            
+        })();
+    </script>
+</body>
+</html>

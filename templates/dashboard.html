@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{ site_name }} — Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ac: {{ theme_color }};
+            --ac-dim: {{ theme_color }}88;
+            --ac-lite: {{ theme_color }}11;
+            --ac-glow: {{ theme_color }}22;
+            --red: #ef4444;
+            --red-dim: #ef444488;
+            --blue: #38bdf8;
+            --blue-dim: #38bdf888;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #06010f;
+            color: #e5e7eb;
+            font-family: 'JetBrains Mono', monospace;
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0015;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--ac-dim);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--ac);
+        }
+        
+        header {
+            background: rgba(10, 0, 21, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 3px solid var(--ac-dim);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-skull {
+            font-size: 20px;
+            filter: drop-shadow(0 0 6px var(--ac));
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .logo-name {
+            color: var(--ac);
+            font-weight: 700;
+            font-size: clamp(13px, 2vw, 15px);
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px var(--ac);
+            transition: color 0.3s ease;
+        }
+        
+        .header-stats {
+            display: flex;
+            gap: 12px;
+            font-size: clamp(9px, 1.5vw, 10px);
+            color: var(--ac-dim);
+            flex-wrap: wrap;
+        }
+        
+        .header-stats span {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--ac-lite);
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: clamp(9px, 1.5vw, 10px);
+            cursor: pointer;
+            border: 2px solid;
+            transition: all .2s;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-ac {
+            border-color: var(--ac-dim);
+            color: var(--ac);
+            background: transparent;
+        }
+        .btn-ac:hover {
+            background: var(--ac-lite);
+            box-shadow: 0 0 8px var(--ac-dim);
+        }
+        
+        .btn-red {
+            border-color: var(--red-dim);
+            color: var(--red);
+            background: transparent;
+        }
+        .btn-red:hover {
+            background: rgba(239, 68, 68, 0.1);
+            box-shadow: 0 0 12px var(--red-dim);
+        }
+        
+        .btn-blue {
+            border-color: var(--blue-dim);
+            color: var(--blue);
+            background: transparent;
+        }
+        .btn-blue:hover {
+            background: rgba(56, 189, 248, 0.1);
+            box-shadow: 0 0 12px var(--blue-dim);
+        }
+        
+        main {
+            padding: 20px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: rgba(13, 0, 13, 0.8);
+            border: 3px solid #1a0a1a;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--ac-dim);
+            transform: translateY(-2px);
+        }
+        
+        .stat-num {
+            font-size: clamp(28px, 5vw, 32px);
+            font-weight: 700;
+        }
+        
+        .stat-num.ac {
+            color: var(--ac);
+            text-shadow: 0 0 16px var(--ac);
+        }
+        .stat-num.white {
+            color: #e5e7eb;
+        }
+        
+        .stat-label {
+            font-size: clamp(9px, 1.5vw, 10px);
+            color: #4b5563;
+            letter-spacing: 2px;
+            margin-top: 2px;
+            text-transform: uppercase;
+        }
+        
+        .server-card {
+            background: rgba(10, 0, 21, 0.9);
+            border: 3px solid #1a0a2a;
+            border-left-width: 6px;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .server-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--ac-dim), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .server-card:hover::before {
+            opacity: 1;
+        }
+        
+        .server-card.running {
+            border-left-color: var(--ac);
+        }
+        .server-card.stopped {
+            border-left-color: var(--red);
+        }
+        
+        .server-card:hover {
+            border-color: var(--ac-dim);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .server-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .server-name {
+            font-weight: 700;
+            font-size: clamp(14px, 2.5vw, 15px);
+            color: #fff;
+            letter-spacing: .5px;
+            word-break: break-all;
+        }
+        
+        .server-name .runtime-badge {
+            font-size: 10px;
+            color: var(--ac-dim);
+            font-weight: 400;
+            margin-left: 6px;
+        }
+        
+        .status-badge {
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: clamp(10px, 1.5vw, 11px);
+            font-weight: 700;
+            border: 2px solid;
+            white-space: nowrap;
+        }
+        
+        .status-badge.running {
+            border-color: var(--ac);
+            color: var(--ac);
+            box-shadow: 0 0 8px var(--ac-lite);
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .status-badge.stopped {
+            border-color: var(--red);
+            color: var(--red);
+        }
+        
+        .server-sub {
+            font-size: clamp(10px, 1.5vw, 11px);
+            color: #4b5563;
+            margin-bottom: 14px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .server-sub span {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #1a0a2a;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            width: 40px;
+            height: 36px;
+            background: transparent;
+            border-radius: 7px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .15s;
+            font-family: inherit;
+            border: 2px solid;
+            position: relative;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .action-btn .tooltip {
+            position: absolute;
+            bottom: -28px;
+            background: #0a0015;
+            color: #e5e7eb;
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #1a0a2a;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+        
+        .action-btn:hover .tooltip {
+            opacity: 1;
+        }
+        
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #374151;
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: .3;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* FAB Button */
+        .fab {
+            bottom: 28px;
+            right: 28px;
+            position: fixed;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--ac);
+            color: #000;
+            border: none;
+            font-size: 28px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 0 25px var(--ac-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            transition: all .3s;
+            font-family: inherit;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 0 40px var(--ac-dim);
+        }
+        
+        .fab:active {
+            transform: scale(0.95);
+        }
+        
+        /* Modal */
+        .modal-bg {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-bg.show {
+            display: flex;
+        }
+        
+        .modal {
+            background: #0a0015;
+            border: 3px solid var(--ac);
+            border-radius: 12px;
+            padding: 28px;
+            width: 90%;
+            max-width: 340px;
+            box-shadow: 0 0 32px var(--ac-lite);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-title {
+            font-size: clamp(13px, 2vw, 14px);
+            font-weight: 700;
+            color: var(--ac);
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--ac-lite);
+        }
+        
+        .form-group {
+            margin-bottom: 14px;
+        }
+        
+        .form-label {
+            font-size: clamp(10px, 1.5vw, 11px);
+            color: #6b7280;
+            display: block;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 9px 12px;
+            background: #111;
+            border: 2px solid var(--ac-dim);
+            border-radius: 7px;
+            color: var(--ac);
+            font-family: inherit;
+            font-size: clamp(12px, 1.8vw, 13px);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            border-color: var(--ac);
+            box-shadow: 0 0 15px var(--ac-lite);
+        }
+        
+        .form-input::placeholder {
+            color: #4b5563;
+        }
+        
+        select.form-input option {
+            background: #0a0015;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: clamp(12px, 1.8vw, 13px);
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 1px;
+            border: 3px solid var(--ac);
+            background: transparent;
+            color: var(--ac);
+            transition: all 0.3s ease;
+        }
+        
+        .modal-btn:hover {
+            background: var(--ac-lite);
+            box-shadow: 0 0 15px var(--ac-lite);
+        }
+        
+        .modal-cancel {
+            border-color: #333;
+            color: #6b7280;
+        }
+        
+        .modal-cancel:hover {
+            border-color: #555;
+            color: #999;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            background: rgba(10, 0, 21, 0.95);
+            border: 3px solid var(--ac);
+            border-radius: 10px;
+            padding: 12px 18px;
+            font-size: clamp(12px, 1.8vw, 13px);
+            color: var(--ac);
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all .3s;
+            z-index: 200;
+            box-shadow: 0 0 20px var(--ac-lite);
+            max-width: 90%;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        
+        #toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .upload-input {
+            display: none;
+        }
+        
+        /* Upload progress */
+        .upload-progress {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 0, 21, 0.95);
+            border: 3px solid var(--ac);
+            border-radius: 12px;
+            padding: 30px;
+            z-index: 150;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 200px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        
+        .upload-progress.show {
+            display: flex;
+        }
+        
+        .upload-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--ac-dim);
+            border-top-color: var(--ac);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            header {
+                padding: 10px 16px;
+            }
+            
+            main {
+                padding: 12px;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            
+            .stat-card {
+                padding: 12px;
+            }
+            
+            .server-card {
+                padding: 14px;
+            }
+            
+            .actions {
+                gap: 6px;
+            }
+            
+            .action-btn {
+                width: 36px;
+                height: 32px;
+                font-size: 12px;
+            }
+            
+            .fab {
+                width: 48px;
+                height: 48px;
+                font-size: 24px;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .header-stats span {
+                font-size: 8px;
+                padding: 1px 6px;
+            }
+            
+            .server-sub {
+                flex-direction: column;
+                gap: 4px;
+            }
+            
+            .modal {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <span class="logo-skull">✦</span>
+            <span class="logo-name" id="brandName">{{ site_name }}</span>
+        </div>
+        <div class="header-stats">
+            <span id="statCpu">CPU: --%</span>
+            <span id="statRam">RAM: --%</span>
+            <span id="statDisk">DISK: --%</span>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-ac" onclick="refreshStatus()" title="Refresh Status">⟳</button>
+            <a href="/logout" class="btn btn-red">LOGOUT</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-num ac" id="runningCount">{{ running }}</div>
+                <div class="stat-label">RUNNING</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num white" id="totalCount">{{ total }}</div>
+                <div class="stat-label">TOTAL</div>
+            </div>
+        </div>
+
+        <div id="serverList">
+            {% if servers %}
+                {% for name, cfg in servers.items() %}
+                <div class="server-card {{ cfg.status }}" id="server-{{ name }}">
+                    <div class="server-top">
+                        <span class="server-name">
+                            {{ name.upper() }}
+                            <span class="runtime-badge">{{ cfg.runtime }}</span>
+                        </span>
+                        <span class="status-badge {{ cfg.status }}" id="status-{{ name }}">{{ cfg.status.upper() }}</span>
+                    </div>
+                    <div class="server-sub">
+                        <span>📄 {{ cfg.main_file or 'main.py' }}</span>
+                        <span>🔌 {{ cfg.port }}</span>
+                        <span>📅 {{ cfg.created[:10] }}</span>
+                    </div>
+                    <div class="actions">
+                        <form action="/server/{{ name }}/toggle" method="POST" style="display:inline">
+                            <button class="action-btn" 
+                                    style="border-color:{% if cfg.status == 'running' %}{{ '#ef444488' }}{% else %}{{ 'var(--ac-dim)' }}{% endif %};
+                                           color:{% if cfg.status == 'running' %}{{ '#ef4444' }}{% else %}{{ 'var(--ac)' }}{% endif %}"
+                                    title="{% if cfg.status == 'running' %}Stop{% else %}Start{% endif %}"
+                                    onclick="event.preventDefault(); toggleServer('{{ name }}')">
+                                {% if cfg.status == 'running' %}■{% else %}▶{% endif %}
+                            </button>
+                        </form>
+                        <a href="/server/{{ name }}" class="action-btn" style="border-color:var(--blue-dim);color:var(--blue)" title="Manage">⚙</a>
+                        <button class="action-btn upload-btn" 
+                                style="border-color:var(--ac-dim);color:var(--ac)" 
+                                title="Upload Files" 
+                                onclick="document.getElementById('upload-{{ name }}').click()">📁</button>
+                        <input type="file" id="upload-{{ name }}" class="upload-input" 
+                               accept=".zip,.py,.js,.ts,.html,.css,.json,.txt,.md,.sh,.yml,.yaml,.ini,.cfg,.conf" 
+                               data-server="{{ name }}">
+                        <form action="/server/delete/{{ name }}" method="POST" style="display:inline" 
+                              onsubmit="return confirm('⚠️ Delete {{ name }} permanently? This cannot be undone!')">
+                            <button class="action-btn" style="border-color:#ef444488;color:#ef4444" title="Delete">🗑</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty">
+                    <div class="empty-icon">📂</div>
+                    <div>NO PROJECTS YET</div>
+                    <div style="font-size:11px;color:#4b5563;margin-top:8px">Click + to create one</div>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <button class="fab" onclick="document.getElementById('createModal').classList.add('show')">+</button>
+
+    <div id="createModal" class="modal-bg" onclick="if(event.target===this)this.classList.remove('show')">
+        <div class="modal">
+            <div class="modal-title">✦ NEW PROJECT</div>
+            <form action="/server/create" method="POST" id="createForm">
+                <div class="form-group">
+                    <label class="form-label">PROJECT NAME</label>
+                    <input class="form-input" name="name" placeholder="my-bot" required autofocus pattern="[a-zA-Z0-9_-]+" title="Only letters, numbers, underscores and hyphens">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">RUNTIME</label>
+                    <select class="form-input" name="runtime">
+                        <option value="python">🐍 Python</option>
+                        <option value="node">🟢 Node.js</option>
+                        <option value="static">🌐 Static</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="modal-btn">CREATE</button>
+                    <button type="button" class="modal-btn modal-cancel" onclick="document.getElementById('createModal').classList.remove('show')">CANCEL</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload Progress -->
+    <div class="upload-progress" id="uploadProgress">
+        <div class="upload-spinner"></div>
+        <span style="color:var(--ac);font-size:13px;">Uploading...</span>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        // ===== SERVER TOGGLE =====
+        async function toggleServer(name) {
+            const card = document.getElementById('server-' + name);
+            const statusBadge = document.getElementById('status-' + name);
+            const isRunning = card.classList.contains('running');
+            
+            try {
+                const res = await fetch('/server/' + name + (isRunning ? '/stop' : '/start'), {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    toast('✓ ' + name + ' ' + (isRunning ? 'stopped' : 'started') + ' successfully');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    toast('✗ ' + (data.error || 'Operation failed'), '#ef4444');
+                }
+            } catch (e) {
+                toast('✗ Network error: ' + e.message, '#ef4444');
+            }
+        }
+
+        // ===== FILE UPLOAD =====
+        document.querySelectorAll('.upload-input').forEach(input => {
+            input.addEventListener('change', async function(e) {
+                if (!this.files[0]) return;
+                
+                const file = this.files[0];
+                const serverName = this.dataset.server;
+                
+                // Validate file size (max 10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    toast('✗ File too large (max 10MB)', '#ef4444');
+                    this.value = '';
+                    return;
+                }
+                
+                const fd = new FormData();
+                fd.append('file', file);
+                
+                const progress = document.getElementById('uploadProgress');
+                progress.classList.add('show');
+                
+                try {
+                    const r = await fetch('/server/' + serverName + '/upload', {
+                        method: 'POST',
+                        body: fd
+                    });
+                    const d = await r.json();
+                    
+                    if (d.success) {
+                        toast('✓ Uploaded ' + d.files.length + ' file(s) to ' + serverName);
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        toast('✗ ' + (d.error || 'Upload failed'), '#ef4444');
+                    }
+                } catch (e) {
+                    toast('✗ Upload failed: ' + e.message, '#ef4444');
+                } finally {
+                    progress.classList.remove('show');
+                    this.value = '';
+                }
+            });
+        });
+
+        // ===== SYSTEM STATS =====
+        async function fetchStats() {
+            try {
+                const r = await fetch('/api/stats');
+                const d = await r.json();
+                document.getElementById('statCpu').textContent = 'CPU: ' + d.cpu.toFixed(1) + '%';
+                document.getElementById('statRam').textContent = 'RAM: ' + d.ram.toFixed(1) + '%';
+                document.getElementById('statDisk').textContent = 'DISK: ' + d.disk.toFixed(1) + '%';
+            } catch (e) {
+                // Silent fail for stats
+            }
+        }
+        
+        fetchStats();
+        setInterval(fetchStats, 5000);
+
+        // ===== REFRESH STATUS =====
+        function refreshStatus() {
+            toast('⟳ Refreshing...');
+            setTimeout(() => location.reload(), 500);
+        }
+
+        // ===== TOAST =====
+        function toast(msg, color) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            const ac = getComputedStyle(document.documentElement).getPropertyValue('--ac').trim();
+            t.style.borderColor = color || ac;
+            t.style.color = color || ac;
+            t.classList.add('show');
+            clearTimeout(t._timeout);
+            t._timeout = setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // ===== KEYBOARD SHORTCUTS =====
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+N or N for new project
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                document.getElementById('createModal').classList.add('show');
+            }
+            // Escape to close modal
+            if (e.key === 'Escape') {
+                document.getElementById('createModal').classList.remove('show');
+            }
+            // Ctrl+R for refresh
+            if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                e.preventDefault();
+                refreshStatus();
+            }
+        });
+
+        // ===== THEME COLOR ANIMATION =====
+        const colors = ['#00ff41', '#a855f7', '#38bdf8', '#ef4444', '#fbbf24', '#06b6d4', '#ec4899', '#84cc16'];
+        let colorIndex = 0;
+        let colorInterval = setInterval(() => {
+            colorIndex = (colorIndex + 1) % colors.length;
+            const newColor = colors[colorIndex];
+            const root = document.documentElement;
+            
+            root.style.setProperty('--ac', newColor);
+            root.style.setProperty('--ac-dim', newColor + '88');
+            root.style.setProperty('--ac-lite', newColor + '11');
+            root.style.setProperty('--ac-glow', newColor + '22');
+            
+            // Update elements with dynamic colors
+            const brand = document.getElementById('brandName');
+            if (brand) {
+                brand.style.color = newColor;
+                brand.style.textShadow = '0 0 8px ' + newColor;
+            }
+            
+            document.querySelectorAll('.stat-num.ac, .status-badge.running, .fab, .logo-skull').forEach(el => {
+                el.style.color = newColor;
+                if (el.classList.contains('fab')) {
+                    el.style.background = newColor;
+                    el.style.boxShadow = '0 0 25px ' + newColor + '88';
+                }
+            });
+            
+            document.querySelectorAll('.server-card.running').forEach(el => {
+                el.style.borderLeftColor = newColor;
+            });
+            
+            document.querySelectorAll('.upload-btn').forEach(el => {
+                el.style.borderColor = newColor + '88';
+                el.style.color = newColor;
+            });
+            
+            document.querySelectorAll('.modal-btn:not(.modal-cancel)').forEach(el => {
+                el.style.borderColor = newColor;
+                el.style.color = newColor;
+            });
+        }, 2000); // Changed from 200ms to 2000ms (2 seconds)
+
+        // ===== CLEANUP =====
+        window.addEventListener('beforeunload', () => {
+            if (colorInterval) clearInterval(colorInterval);
+        });
+    </script>
+</body>
+</html>

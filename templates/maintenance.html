@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Maintenance | {{ site_name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a12;
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Background animation */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(239, 68, 68, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(239, 68, 68, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 100%, rgba(239, 68, 68, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        /* Animated background circles */
+        .bg-circles {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(239, 68, 68, 0.05);
+            animation: floatCircle 20s ease-in-out infinite;
+        }
+        
+        .bg-circle:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+        
+        .bg-circle:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            bottom: -100px;
+            left: -80px;
+            animation-delay: -7s;
+        }
+        
+        .bg-circle:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -14s;
+        }
+        
+        @keyframes floatCircle {
+            0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            25% { transform: translate(30px, -20px) scale(1.1) rotate(90deg); }
+            50% { transform: translate(-20px, 30px) scale(0.9) rotate(180deg); }
+            75% { transform: translate(20px, 20px) scale(1.05) rotate(270deg); }
+        }
+        
+        .card {
+            position: relative;
+            z-index: 10;
+            background: rgba(10, 10, 20, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid #ef4444;
+            border-radius: 24px;
+            padding: 48px 40px;
+            text-align: center;
+            max-width: 440px;
+            width: 90%;
+            box-shadow: 0 0 60px rgba(239, 68, 68, 0.2), 0 0 120px rgba(239, 68, 68, 0.1);
+            animation: fadeIn 0.8s ease-out;
+            transition: all 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        /* Glow border animation */
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 24px;
+            padding: 2px;
+            background: conic-gradient(from 0deg, #ef4444, transparent, #ef4444, transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.5;
+            animation: spin 10s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+        
+        .icon-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+        
+        .icon {
+            font-size: 64px;
+            animation: pulse 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(239, 68, 68, 0.4));
+            display: inline-block;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.05) rotate(-5deg); }
+            75% { transform: scale(1.05) rotate(5deg); }
+        }
+        
+        .title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(20px, 4vw, 24px);
+            font-weight: 900;
+            color: #ef4444;
+            letter-spacing: 6px;
+            text-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        .sub {
+            font-size: clamp(12px, 2vw, 14px);
+            color: rgba(239, 68, 68, 0.6);
+            letter-spacing: 4px;
+            margin-bottom: 24px;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+        
+        .message {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(239, 68, 68, 0.2);
+            border-radius: 14px;
+            padding: 16px 20px;
+            font-size: clamp(14px, 2vw, 15px);
+            color: #d1d5db;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            font-weight: 400;
+            position: relative;
+        }
+        
+        .message::before {
+            content: '⚠';
+            display: block;
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        /* Timer/Countdown */
+        .timer-section {
+            margin-bottom: 20px;
+        }
+        
+        .timer-label {
+            font-size: 11px;
+            color: #6b7280;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: 300;
+        }
+        
+        .timer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        
+        .timer-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(239, 68, 68, 0.15);
+            border-radius: 10px;
+            padding: 8px 4px;
+        }
+        
+        .timer-number {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(24px, 4vw, 28px);
+            font-weight: 700;
+            color: #ef4444;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+            display: block;
+            line-height: 1.2;
+        }
+        
+        .timer-unit {
+            font-size: 9px;
+            color: #6b7280;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+        
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 12px;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444, #f87171);
+            border-radius: 2px;
+            width: 0%;
+            animation: progressAnim 10s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+        
+        @keyframes progressAnim {
+            0% { width: 0%; opacity: 0.5; }
+            50% { width: 70%; opacity: 1; }
+            100% { width: 100%; opacity: 0.5; }
+        }
+        
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            background: transparent;
+            color: #ef4444;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        
+        .action-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .action-btn:active {
+            transform: translateY(0);
+        }
+        
+        .action-btn.refresh-btn {
+            border-color: rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+        }
+        
+        .action-btn.refresh-btn:hover {
+            background: rgba(56, 189, 248, 0.1);
+            border-color: #38bdf8;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+        }
+        
+        .footer {
+            font-size: clamp(10px, 1.5vw, 12px);
+            color: #374151;
+            letter-spacing: 2px;
+            font-weight: 300;
+            margin-top: 20px;
+            border-top: 1px solid rgba(239, 68, 68, 0.1);
+            padding-top: 16px;
+        }
+        
+        .footer span {
+            color: #ef4444;
+            opacity: 0.6;
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .card {
+                padding: 32px 24px;
+                border-radius: 20px;
+            }
+            
+            .icon {
+                font-size: 48px;
+            }
+            
+            .timer-grid {
+                gap: 6px;
+            }
+            
+            .timer-item {
+                padding: 6px 4px;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .card {
+                padding: 24px 16px;
+                border-radius: 16px;
+            }
+            
+            .title {
+                letter-spacing: 3px;
+                font-size: 18px;
+            }
+        }
+        
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* Dark mode */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #0a0a12;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Circles -->
+    <div class="bg-circles">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+    
+    <div class="card">
+        <div class="icon-wrapper">
+            <div class="icon">🔧</div>
+        </div>
+        
+        <div class="title">{{ site_name }}</div>
+        <div class="sub">• SYSTEM MAINTENANCE •</div>
+        
+        <div class="message">{{ message }}</div>
+        
+        <!-- Timer/Countdown -->
+        <div class="timer-section">
+            <div class="timer-label">⏳ Estimated Time Remaining</div>
+            <div class="timer-grid">
+                <div class="timer-item">
+                    <span class="timer-number" id="hours">--</span>
+                    <span class="timer-unit">Hours</span>
+                </div>
+                <div class="timer-item">
+                    <span class="timer-number" id="minutes">--</span>
+                    <span class="timer-unit">Mins</span>
+                </div>
+                <div class="timer-item">
+                    <span class="timer-number" id="seconds">--</span>
+                    <span class="timer-unit">Secs</span>
+                </div>
+                <div class="timer-item">
+                    <span class="timer-number" id="status">⏳</span>
+                    <span class="timer-unit">Status</span>
+                </div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="actions">
+            <button class="action-btn refresh-btn" onclick="window.location.reload()">
+                ⟳ Refresh
+            </button>
+            <button class="action-btn" onclick="goBack()">
+                ⬅ Back
+            </button>
+        </div>
+        
+        <div class="footer">
+            <span>✦</span> {{ owner_name }} • Server Management System <span>✦</span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+            
+            // ===== COUNTDOWN TIMER =====
+            // Set estimated time (30 minutes from now)
+            const estimatedTime = new Date();
+            estimatedTime.setMinutes(estimatedTime.getMinutes() + 30);
+            
+            function updateTimer() {
+                const now = new Date();
+                let diff = Math.max(0, estimatedTime - now);
+                
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+                
+                // Update status icon
+                const statusEl = document.getElementById('status');
+                if (diff === 0) {
+                    statusEl.textContent = '✅';
+                    statusEl.style.color = '#00ff41';
+                    document.querySelector('.timer-label').textContent = '🟢 System Online Soon!';
+                } else if (diff < 300000) { // Less than 5 minutes
+                    statusEl.textContent = '🟡';
+                    statusEl.style.color = '#fbbf24';
+                } else {
+                    statusEl.textContent = '⏳';
+                    statusEl.style.color = '#ef4444';
+                }
+            }
+            
+            updateTimer();
+            setInterval(updateTimer, 1000);
+            
+            // ===== GO BACK FUNCTION =====
+            window.goBack = function() {
+                if (document.referrer) {
+                    window.history.back();
+                } else {
+                    window.location.href = '/';
+                }
+            };
+            
+            // ===== AUTO REFRESH =====
+            // Auto refresh every 30 seconds to check if system is back online
+            let refreshCount = 0;
+            const maxRefreshes = 10; // 5 minutes max
+            
+            function autoRefresh() {
+                refreshCount++;
+                if (refreshCount < maxRefreshes) {
+                    fetch('/api/ping')
+                        .then(response => {
+                            if (response.ok) {
+                                // System is back online
+                                window.location.reload();
+                            }
+                        })
+                        .catch(() => {
+                            // Still offline, continue
+                        });
+                }
+            }
+            
+            // Start auto-refresh check every 30 seconds
+            setInterval(autoRefresh, 30000);
+            
+            // ===== KEYBOARD SHORTCUTS =====
+            document.addEventListener('keydown', function(e) {
+                // 'r' key to refresh
+                if (e.key === 'r' && !e.ctrlKey && !e.metaKey) {
+                    e.preventDefault();
+                    window.location.reload();
+                }
+                // 'b' key to go back
+                if (e.key === 'b' && !e.ctrlKey && !e.metaKey) {
+                    e.preventDefault();
+                    goBack();
+                }
+                // Escape to go back
+                if (e.key === 'Escape') {
+                    goBack();
+                }
+            });
+            
+            // ===== BACKGROUND COLOR CYCLE (Subtle) =====
+            const colors = ['#ef4444', '#f87171', '#dc2626', '#b91c1c'];
+            let colorIndex = 0;
+            
+            setInterval(() => {
+                colorIndex = (colorIndex + 1) % colors.length;
+                const nc = colors[colorIndex];
+                const card = document.querySelector('.card');
+                const title = document.querySelector('.title');
+                const icon = document.querySelector('.icon');
+                
+                if (card) {
+                    card.style.borderColor = nc;
+                    card.style.boxShadow = '0 0 60px ' + nc + '22, 0 0 120px ' + nc + '11';
+                }
+                
+                if (title) {
+                    title.style.color = nc;
+                    title.style.textShadow = '0 0 30px ' + nc + '66';
+                }
+                
+                if (icon) {
+                    icon.style.filter = 'drop-shadow(0 0 30px ' + nc + '44)';
+                }
+                
+                // Update border of message
+                const message = document.querySelector('.message');
+                if (message) {
+                    message.style.borderColor = nc + '33';
+                }
+                
+                // Update timer numbers
+                document.querySelectorAll('.timer-number').forEach(el => {
+                    if (el.id !== 'status') {
+                        el.style.color = nc;
+                        el.style.textShadow = '0 0 20px ' + nc + '33';
+                    }
+                });
+                
+            }, 3000); // Change every 3 seconds
+            
+            // ===== CONSOLE EASTER EGG =====
+            console.log('%c🔧 MAINTENANCE MODE', 'font-size:20px; font-weight:bold; color:#ef4444;');
+            console.log('%cPlease check back later!', 'font-size:14px; color:#6b7280;');
+            
+        })();
+    </script>
+</body>
+</html>
